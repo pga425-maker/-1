@@ -426,7 +426,7 @@ class GameSession:
                 (qty, tick, price if qty else None, fee, status,
                  reject or None, order.order_id, self.session_id),
             )
-            fills_by_player.setdefault(order.player_id, []).append({
+            fills_by_player.setdefault(order.player_id, {"orders": []})["orders"].append({
                 "order_id": order.order_id, "symbol": order.symbol,
                 "side": order.side, "status": status, "filled_qty": qty,
                 "requested_qty": order.qty, "fill_price": price if qty else None,
@@ -460,6 +460,11 @@ class GameSession:
         for state in self.players.values():
             if state.tracker is not None:
                 state.tracker.push_asset(state.asset(self.prices))
+
+        # 체결이 있었던 참가자에게는 갱신된 장부를 함께 보낸다. 다시 조회하지 않아도
+        # 현금과 보유 수량이 맞는다.
+        for pid, bundle in fills_by_player.items():
+            bundle["me"] = self.player_view(pid)
 
         headlines = [self._news_item(e, tick) for e in self.scheduler.headlines_at(tick)]
         self.news_feed = headlines + self.news_feed

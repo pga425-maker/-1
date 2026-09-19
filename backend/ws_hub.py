@@ -73,7 +73,7 @@ class WebSocketHub:
             personal = fills.get(conn.player_id)
             if personal:
                 await conn.websocket.send_text(json.dumps(
-                    {"type": "fills", "orders": personal},
+                    {"type": "fills", **personal},
                     ensure_ascii=False, default=str,
                 ))
 
