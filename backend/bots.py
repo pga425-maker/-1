@@ -48,6 +48,7 @@ class MarketView:
     symbols: tuple[str, ...]
     fresh_headline_symbols: tuple[str, ...]   # 최근 헤드라인이 가리킨 종목
     ticks_since_headline: int
+    crowd_favorite: str | None = None         # 최근 몇 틱간 매수가 가장 몰린 종목
 
 
 @dataclass
@@ -62,6 +63,14 @@ class Bot:
     reserved_cash: int = 0
     reserved_qty: dict[str, int] = field(default_factory=dict)
     seeded: bool = False
+    herding_prob: float = 0.0
+    """남이 사는 것을 따라 살 확률.
+
+    스펙 8번 튜닝 봇은 독립적으로 움직이는 것이 원안이라 기본값은 0.0 이다.
+    다만 실제 현장의 50명은 몰려다니고, 저항 메커니즘은 주문이 한 종목·한 시점에
+    몰릴 때만 작동한다. 독립 봇만으로는 재야 할 현상이 나타나지 않아서
+    그리드의 독립 축으로 뒀다. 0.0 으로 두면 스펙 원안 그대로다.
+    """
 
     # ---------- 자산 ----------
 
@@ -78,6 +87,16 @@ class Bot:
     # ---------- 주문 ----------
 
     def decide(self, view: MarketView, max_position_ratio: float) -> Order | None:
+        # 군집 행동이 자기 전략보다 먼저 온다. 남들이 우르르 사는 것을 보면
+        # 자기 기준을 접고 따라 사는 것이 처음 해 보는 사람의 실제 행동이다.
+        if (
+            self.herding_prob > 0.0
+            and view.crowd_favorite is not None
+            and self.rng.random() < self.herding_prob
+        ):
+            order = self._buy(view.crowd_favorite, view, 0.35, max_position_ratio)
+            if order is not None:
+                return order
         handler = getattr(self, f"_decide_{self.strategy}")
         return handler(view, max_position_ratio)
 
@@ -181,7 +200,7 @@ class Bot:
 
 
 def build_bots(
-    count: int, starting_cash: int, seed: int
+    count: int, starting_cash: int, seed: int, herding_prob: float = 0.0
 ) -> list[Bot]:
     """전략 5종을 고르게 섞어 봇을 만든다. 시드가 같으면 같은 봇 집단이 나온다."""
     rng = random.Random(seed)
@@ -192,5 +211,6 @@ def build_bots(
             bot_id=i, strategy=strategy, cash=starting_cash,
             starting_cash=starting_cash,
             rng=random.Random(rng.randrange(1 << 30)),
+            herding_prob=herding_prob,
         ))
     return bots
