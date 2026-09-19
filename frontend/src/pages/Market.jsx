@@ -13,7 +13,7 @@ export default function Market() {
   const [sortBy, setSortBy] = useState('default')
   if (!snapshot) return <Loading />
 
-  const { stocks, indices, badges, session } = snapshot
+  const { stocks, indices, badges, session, flow } = snapshot
   const byChange = [...stocks].sort((a, b) => b.chg_pct - a.chg_pct)
   const best = byChange[0]
   const worst = byChange[byChange.length - 1]
@@ -26,8 +26,8 @@ export default function Market() {
       <ShortPressureBanner badges={badges} stocks={stocks} />
 
       <div className="grid grid-cols-2 gap-2.5">
-        <HighlightCard stock={best} label="상승 1위" />
-        <HighlightCard stock={worst} label="하락 1위" />
+        <HighlightCard stock={best} label="상승 1위" flow={flow?.[best?.symbol]} />
+        <HighlightCard stock={worst} label="하락 1위" flow={flow?.[worst?.symbol]} />
       </div>
 
       <div className="flex items-center gap-1.5 pt-4 pb-2">
@@ -44,7 +44,11 @@ export default function Market() {
           <StockRow
             key={s.symbol}
             stock={s}
-            sub={`${s.sector} · ${won(s.price)}원`}
+            sub={
+              flow?.[s.symbol]?.buyers
+                ? `${s.sector} · 순매수 ${flow[s.symbol].buyers}명`
+                : `${s.sector} · ${won(s.price)}원`
+            }
             right={<PriceCell value={s.price} changePct={s.chg_pct} />}
           />
         ))}
@@ -54,7 +58,7 @@ export default function Market() {
   )
 }
 
-function HighlightCard({ stock, label }) {
+function HighlightCard({ stock, label, flow }) {
   if (!stock) return null
   return (
     <div style={{ background: COLOR.card, borderRadius: 16, padding: 15 }}>
@@ -78,6 +82,13 @@ function HighlightCard({ stock, label }) {
         {pct(stock.chg_pct)}
       </div>
       <div style={{ fontSize: 11, color: COLOR.muted }}>{won(stock.price)}원</div>
+      <div style={{ fontSize: 11, color: COLOR.muted, marginTop: 6 }}>
+        {flow && flow.buyers > 0
+          ? `지금 순매수 ${flow.buyers}명`
+          : flow && flow.sellers > 0
+            ? `지금 순매도 ${flow.sellers}명`
+            : '지금은 조용합니다'}
+      </div>
     </div>
   )
 }

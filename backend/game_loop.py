@@ -137,6 +137,8 @@ class GameSession:
 
         self.queued: list[PendingOrder] = []   # 이번 틱에 접수된 주문
         self.pending: list[PendingOrder] = []  # 다음 틱에 체결될 주문
+        # 최근 몇 틱간 종목별 순매수 참가자. 시세 화면의 "지금 순매수 N명" 에 쓴다.
+        self.recent_flow: list[tuple[int, int, str, int]] = []   # (틱, 참가자, 종목, 부호x수량)
 
         self.lock = asyncio.Lock()
         self.hub = None                        # main.py 가 주입한다
@@ -298,6 +300,9 @@ class GameSession:
             reserved=reserved,
         )
         self.queued.append(order)
+        self.recent_flow.append(
+            (self.tick, player_id, symbol, qty if side == "buy" else -qty)
+        )
         self.conn.execute(
             """INSERT INTO orders
                (id, session_id, player_id, symbol, side, requested_qty, reason,
@@ -492,6 +497,8 @@ class GameSession:
                 for s in self.symbols
             },
             "chg_tick": {r.symbol: r.actual_delta for r in tick_rows},
+            "f": {r.symbol: round(r.f, 4) for r in tick_rows},
+            "flow": self.flow_summary(),
             "fear": round(self.fear[-1], 1),
             "fx": round(self.fx[-1], 1),
             "disp": {
@@ -530,6 +537,30 @@ class GameSession:
                      state.avg_cost.get(symbol, 0.0),
                      state.realized_pnl.get(symbol, 0)),
                 )
+
+    def flow_summary(self) -> dict[str, dict]:
+        """종목별 주문 쏠림 요약.
+
+        f 는 가격 계산에 쓴 값 그대로이고, 참가자 수는 최근 구간에서 순매수인
+        사람만 센다. f 만으로는 몇 명이 몰렸는지 알 수 없어서 둘을 같이 내려 준다.
+        """
+        window = self.scenario.params.snapshot_interval_ticks
+        cutoff = self.tick - window
+        self.recent_flow = [r for r in self.recent_flow if r[0] > cutoff]
+
+        net: dict[str, dict[int, int]] = {s: {} for s in self.symbols}
+        for _, player_id, symbol, signed in self.recent_flow:
+            bucket = net.setdefault(symbol, {})
+            bucket[player_id] = bucket.get(player_id, 0) + signed
+
+        summary = {}
+        for symbol in self.symbols:
+            people = net.get(symbol, {})
+            summary[symbol] = {
+                "buyers": sum(1 for v in people.values() if v > 0),
+                "sellers": sum(1 for v in people.values() if v < 0),
+            }
+        return summary
 
     def _news_item(self, event, tick: int) -> dict:
         return {
@@ -613,6 +644,7 @@ class GameSession:
                 for n in self.news_feed[:20]
             ],
             "badges": self.scheduler.active_badges(self.tick),
+            "flow": self.flow_summary(),
             "rank": self.rank_snapshot[:BOARD_TOP],
             "players_count": sum(
                 1 for p in self.players.values() if p.status == "active"

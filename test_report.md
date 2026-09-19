@@ -1,6 +1,6 @@
 # 테스트 결과
 
-- 실행 시각: 2026-09-19 17:17:17
+- 실행 시각: 2026-09-19 17:22:00
 - 실행 범위: all
 - 실행 환경: Python 3.11.15
 
@@ -20,7 +20,7 @@
     _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-109 passed, 2 warnings in 2.08s
+109 passed, 2 warnings in 2.04s
 ```
 
 ## 동시성 테스트
@@ -44,7 +44,7 @@
     _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-6 passed, 2 warnings in 0.54s
+6 passed, 2 warnings in 0.50s
 ```
 
 ## 부하 테스트
@@ -58,9 +58,9 @@
 서버 측 예외: 0건
 WebSocket 연결 끊김: 0건
 클라이언트 오류: 0건
-수신 지연(클라이언트 기준) p50 8.5ms  p95 11.6ms  p99 14.8ms  최대 17.8ms  표본 18650개
-브로드캐스트 소요(서버 기준) p50 5.3ms  p95 7.6ms  p99 8.6ms
-틱 처리 시간 평균 3.5ms  최대 10.6ms
+수신 지연(클라이언트 기준) p50 9.1ms  p95 12.0ms  p99 15.1ms  최대 18.7ms  표본 18650개
+브로드캐스트 소요(서버 기준) p50 5.5ms  p95 7.5ms  p99 8.7ms
+틱 처리 시간 평균 3.4ms  최대 5.5ms
 수신한 틱 메시지 18650개 (기대 18750개, 99.5%)
 
 부하 테스트 통과
@@ -73,11 +73,11 @@ WebSocket 연결 끊김: 0건
   from starlette.testclient import TestClient as TestClient  # noqa
 시작: 2026 축제 1회차 (배속 120.0x, 시드 777)
 참가 12명
-완주: 틱 375/375, 주문 258건 (거부 3건)
+완주: 틱 375/375, 주문 256건 (거부 3건)
 공매도 집중 이벤트 2회 편성
-결과 분석: 원인분해 4항목, 근거별 6종, 군중심리 1구간, 공매도 2건
+결과 분석: 원인분해 4항목, 근거별 6종, 군중심리 2구간, 공매도 2건
 CSV 내보내기: export_result.csv / export_orders.csv / export_tick_log.csv
-틱 소요 평균 3.5ms 최대 6.1ms
+틱 소요 평균 3.6ms 최대 11.1ms
 
 E2E 통과
 ```
@@ -86,7 +86,7 @@ E2E 통과
 
 ```
 ........                                                                 [100%]
-8 passed in 0.29s
+8 passed in 0.30s
 ```
 
 ## 스펙 16번 합격 기준 대응

@@ -58,6 +58,7 @@ export function GameProvider({ children }) {
         me,
         news,
         badges: msg.badges || {},
+        flow: msg.flow || prev.flow,
         rank: msg.rank?.length ? msg.rank : prev.rank,
         players_count: msg.players_count ?? prev.players_count,
         indices: {
