@@ -49,18 +49,38 @@ run_stage() {
 echo "테스트 실행 (${ONLY})"
 
 run_stage "단위 테스트" "backend/tests" \
-  python3 -m pytest backend/tests -q --tb=short
+  python3 -m pytest backend/tests -q --tb=short --ignore=backend/tests/test_concurrency.py
 
 if [ "$ONLY" = "all" ]; then
   run_stage "동시성 테스트" "backend/tests/test_concurrency.py" \
     python3 -m pytest backend/tests/test_concurrency.py -q
+  run_stage "재접속 복구" "backend/tests/test_reconnect.py" \
+    python3 -m pytest backend/tests/test_reconnect.py -q
   run_stage "부하 테스트" "scripts/load_test.py" \
     python3 scripts/load_test.py
   run_stage "E2E 스모크" "scripts/e2e_smoke.py" \
     python3 scripts/e2e_smoke.py
+  run_stage "분석 성향 구분" "backend/tests/test_analysis.py" \
+    python3 -m pytest backend/tests/test_analysis.py -q
 fi
 
 {
+  echo
+  echo "## 스펙 16번 합격 기준 대응"
+  echo
+  echo "| 기준 | 어디서 확인하는가 |"
+  echo "|---|---|"
+  echo "| price_engine 불변 조건 4개 | backend/tests/test_price_engine.py |"
+  echo "| 공매도 펌프 < 덤프 불변 조건 | backend/tests/test_event_scheduler.py |"
+  echo "| 공포지수 0~100 clamp | backend/tests/test_index_engine.py |"
+  echo "| 뉴스 지연 타이밍 | backend/tests/test_event_scheduler.py |"
+  echo "| scoring 표준편차 0 | backend/tests/test_scoring.py |"
+  echo "| 주문 검증 7종 거부 | backend/tests/test_orders.py |"
+  echo "| 동시 주문 100건, 잔고 보존 | backend/tests/test_concurrency.py |"
+  echo "| 재접속 시 보유·잔고 복구 | backend/tests/test_reconnect.py |"
+  echo "| WS 50개로 375틱, p95 < 300ms | scripts/load_test.py |"
+  echo "| 1판 무인 완주 + CSV 생성 | scripts/e2e_smoke.py |"
+  echo "| 성향 5유형 구분 | backend/tests/test_analysis.py |"
   echo
   echo "---"
   echo

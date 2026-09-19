@@ -13,3 +13,4 @@ frontend/dist/
 export_*.csv
 e2e_smoke.db
 load_test.db
+*.json.bak

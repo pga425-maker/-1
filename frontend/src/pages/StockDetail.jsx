@@ -41,8 +41,20 @@ export default function StockDetail() {
   const diff = price - stock.initial_price
   const amount = qty * price
   const fee = Math.round(amount * 0.00015)
+
+  // 한 종목 총자산 50% 상한과 현금 중 더 빡빡한 쪽이 실제 한도다.
+  const me = snapshot.me
+  const byCash = me ? Math.floor(me.cash / (price * 1.00015)) : 0
+  const heldValue = (holding?.quantity || 0) * price
+  const roomValue = me ? Math.floor(me.total_asset * 0.5) - heldValue : 0
+  const byRoom = Math.max(0, Math.floor(roomValue / price))
+  const maxBuy = Math.max(0, Math.min(byCash, byRoom))
+  const limitedBy = byRoom < byCash ? '비중 상한' : '현금'
+  const overLimit = side === 'buy' && qty > maxBuy
   const canSubmit =
-    qty > 0 && (side === 'sell' || reason) && snapshot.session.status === 'running'
+    qty > 0 &&
+    (side === 'sell' || (reason && !overLimit)) &&
+    snapshot.session.status === 'running'
 
   async function submit() {
     setBusy(true)
@@ -162,6 +174,9 @@ export default function StockDetail() {
         onSubmit={submit}
         message={message}
         maxSell={holding?.quantity || 0}
+        maxBuy={maxBuy}
+        limitedBy={limitedBy}
+        overLimit={overLimit}
       />
     </div>
   )
@@ -263,7 +278,7 @@ function PriceChart({ data, rising }) {
 
 function OrderPanel({
   side, setSide, qty, setQty, reason, setReason, amount, fee,
-  canSubmit, busy, onSubmit, message, maxSell,
+  canSubmit, busy, onSubmit, message, maxSell, maxBuy, limitedBy, overLimit,
 }) {
   const buying = side === 'buy'
   return (
@@ -356,6 +371,17 @@ function OrderPanel({
             보유 {maxSell}주 전량
           </button>
         )}
+        {buying && (
+          <button
+            onClick={() => setQty(Math.max(1, maxBuy))}
+            disabled={maxBuy <= 0}
+            style={{ fontSize: 11, color: COLOR.muted, marginTop: 4 }}
+          >
+            {maxBuy > 0
+              ? `최대 ${maxBuy}주 (${limitedBy} 기준)`
+              : `${limitedBy} 때문에 더 담을 수 없습니다`}
+          </button>
+        )}
 
         <div
           className="flex items-center justify-between"
@@ -399,6 +425,13 @@ function OrderPanel({
           </div>
         )}
 
+        {overLimit && (
+          <div style={{ marginTop: 10, fontSize: 12, fontWeight: 700, color: COLOR.up }}>
+            {limitedBy === '비중 상한'
+              ? `한 종목에 총자산의 50% 까지만 담을 수 있습니다. 최대 ${maxBuy}주`
+              : `현금이 모자랍니다. 최대 ${maxBuy}주`}
+          </div>
+        )}
         {message && (
           <div
             style={{
