@@ -1,0 +1,786 @@
+{
+  "name": "2026 축제 1회차",
+  "tick_seconds": 4.8,
+  "total_ticks": 375,
+  "starting_cash": 10000000,
+  "params": {
+    "resistance_coef": 0.7,
+    "dampening_cap": 0.6,
+    "noise_sigma": 0.004,
+    "fear_sensitivity": 0.35,
+    "fx_sensitivity": 2.5,
+    "min_price": 100,
+    "net_loss_margin": 0.15,
+    "min_visible_pump": 1.05,
+    "fee_rate": 0.00015,
+    "max_position_ratio": 0.5,
+    "snapshot_interval_ticks": 8,
+    "min_ticks_for_risk_rank": 60
+  },
+  "fear_index": {
+    "initial": 20,
+    "theta": 0.15,
+    "noise_sigma": 0.8,
+    "segments": [
+      {
+        "from": 0,
+        "to": 90,
+        "target": 20
+      },
+      {
+        "from": 90,
+        "to": 135,
+        "target": 36
+      },
+      {
+        "from": 135,
+        "to": 165,
+        "target": 31
+      },
+      {
+        "from": 165,
+        "to": 210,
+        "target": 28
+      },
+      {
+        "from": 210,
+        "to": 240,
+        "target": 33
+      },
+      {
+        "from": 240,
+        "to": 275,
+        "target": 26
+      },
+      {
+        "from": 275,
+        "to": 300,
+        "target": 30
+      },
+      {
+        "from": 300,
+        "to": 318,
+        "target": 44
+      },
+      {
+        "from": 318,
+        "to": 345,
+        "target": 54
+      },
+      {
+        "from": 345,
+        "to": 362,
+        "target": 47
+      },
+      {
+        "from": 362,
+        "to": 375,
+        "target": 43
+      }
+    ]
+  },
+  "fx_rate": {
+    "initial": 1315,
+    "theta": 0.1,
+    "noise_sigma": 1.2,
+    "segments": [
+      {
+        "from": 0,
+        "to": 90,
+        "target": 1318
+      },
+      {
+        "from": 90,
+        "to": 150,
+        "target": 1322
+      },
+      {
+        "from": 150,
+        "to": 210,
+        "target": 1262
+      },
+      {
+        "from": 210,
+        "to": 260,
+        "target": 1272
+      },
+      {
+        "from": 260,
+        "to": 300,
+        "target": 1268
+      },
+      {
+        "from": 300,
+        "to": 345,
+        "target": 1298
+      },
+      {
+        "from": 345,
+        "to": 375,
+        "target": 1290
+      }
+    ]
+  },
+  "stocks": [
+    {
+      "symbol": "A001",
+      "name": "가온반도체",
+      "sector": "반도체",
+      "initial_price": 52000,
+      "liquidity": 380,
+      "beta": 1.1,
+      "fx_exposure": 0.8,
+      "narrative": "supercycle",
+      "short_pressure_weight": 0.0,
+      "avatar_color": "#2D2A6E",
+      "noise_sigma": 0.004,
+      "drift_segments": [
+        {
+          "from": 0,
+          "to": 90,
+          "drift": 0.00075
+        },
+        {
+          "from": 90,
+          "to": 150,
+          "drift": 0.0004
+        },
+        {
+          "from": 150,
+          "to": 210,
+          "drift": 0.001
+        },
+        {
+          "from": 210,
+          "to": 240,
+          "drift": 0.0012
+        },
+        {
+          "from": 240,
+          "to": 260,
+          "drift": 0.0014
+        },
+        {
+          "from": 260,
+          "to": 280,
+          "drift": 0.0015
+        },
+        {
+          "from": 280,
+          "to": 295,
+          "drift": 0.0016
+        },
+        {
+          "from": 295,
+          "to": 315,
+          "drift": 0.0018
+        },
+        {
+          "from": 315,
+          "to": 335,
+          "drift": 0.0013
+        },
+        {
+          "from": 335,
+          "to": 355,
+          "drift": 0.00175
+        },
+        {
+          "from": 355,
+          "to": 375,
+          "drift": 0.0011
+        }
+      ]
+    },
+    {
+      "symbol": "A002",
+      "name": "한별에너지",
+      "sector": "에너지",
+      "initial_price": 68000,
+      "liquidity": 290,
+      "beta": 0.6,
+      "fx_exposure": -0.2,
+      "narrative": "stable",
+      "short_pressure_weight": 0.0,
+      "avatar_color": "#A05A3C",
+      "noise_sigma": 0.0015,
+      "drift_segments": [
+        {
+          "from": 0,
+          "to": 90,
+          "drift": 0.0002
+        },
+        {
+          "from": 90,
+          "to": 150,
+          "drift": 0.00018
+        },
+        {
+          "from": 150,
+          "to": 210,
+          "drift": 0.00022
+        },
+        {
+          "from": 210,
+          "to": 240,
+          "drift": 0.00025
+        },
+        {
+          "from": 240,
+          "to": 260,
+          "drift": 0.0002
+        },
+        {
+          "from": 260,
+          "to": 280,
+          "drift": 0.00022
+        },
+        {
+          "from": 280,
+          "to": 295,
+          "drift": 0.00024
+        },
+        {
+          "from": 295,
+          "to": 315,
+          "drift": 0.00026
+        },
+        {
+          "from": 315,
+          "to": 335,
+          "drift": 0.00018
+        },
+        {
+          "from": 335,
+          "to": 355,
+          "drift": 0.00024
+        },
+        {
+          "from": 355,
+          "to": 375,
+          "drift": 0.0002
+        }
+      ]
+    },
+    {
+      "symbol": "A003",
+      "name": "청솔바이오",
+      "sector": "바이오",
+      "initial_price": 24000,
+      "liquidity": 540,
+      "beta": 1.4,
+      "fx_exposure": 0.1,
+      "narrative": "binary",
+      "short_pressure_weight": 0.5,
+      "avatar_color": "#5E7A63",
+      "noise_sigma": 0.005,
+      "drift_segments": [
+        {
+          "from": 0,
+          "to": 90,
+          "drift": 5e-05
+        },
+        {
+          "from": 90,
+          "to": 150,
+          "drift": 0.0
+        },
+        {
+          "from": 150,
+          "to": 210,
+          "drift": 5e-05
+        },
+        {
+          "from": 210,
+          "to": 240,
+          "drift": 0.0001
+        },
+        {
+          "from": 240,
+          "to": 260,
+          "drift": 0.0025
+        },
+        {
+          "from": 260,
+          "to": 280,
+          "drift": 0.0022
+        },
+        {
+          "from": 280,
+          "to": 295,
+          "drift": 0.0018
+        },
+        {
+          "from": 295,
+          "to": 315,
+          "drift": 0.0012
+        },
+        {
+          "from": 315,
+          "to": 335,
+          "drift": 0.0004
+        },
+        {
+          "from": 335,
+          "to": 355,
+          "drift": 0.0008
+        },
+        {
+          "from": 355,
+          "to": 375,
+          "drift": 0.0004
+        }
+      ]
+    },
+    {
+      "symbol": "A004",
+      "name": "늘봄유통",
+      "sector": "유통",
+      "initial_price": 15500,
+      "liquidity": 840,
+      "beta": 0.7,
+      "fx_exposure": -0.6,
+      "narrative": "stable",
+      "short_pressure_weight": 0.0,
+      "avatar_color": "#8A6D3F",
+      "noise_sigma": 0.0015,
+      "drift_segments": [
+        {
+          "from": 0,
+          "to": 90,
+          "drift": 0.00015
+        },
+        {
+          "from": 90,
+          "to": 150,
+          "drift": 0.00012
+        },
+        {
+          "from": 150,
+          "to": 210,
+          "drift": 0.00025
+        },
+        {
+          "from": 210,
+          "to": 240,
+          "drift": 0.0002
+        },
+        {
+          "from": 240,
+          "to": 260,
+          "drift": 0.00015
+        },
+        {
+          "from": 260,
+          "to": 280,
+          "drift": 0.00018
+        },
+        {
+          "from": 280,
+          "to": 295,
+          "drift": 0.00016
+        },
+        {
+          "from": 295,
+          "to": 315,
+          "drift": 0.00014
+        },
+        {
+          "from": 315,
+          "to": 335,
+          "drift": 0.00012
+        },
+        {
+          "from": 335,
+          "to": 355,
+          "drift": 0.00016
+        },
+        {
+          "from": 355,
+          "to": 375,
+          "drift": 0.00013
+        }
+      ]
+    },
+    {
+      "symbol": "A005",
+      "name": "파란로지스틱스",
+      "sector": "물류",
+      "initial_price": 19000,
+      "liquidity": 680,
+      "beta": 0.9,
+      "fx_exposure": -0.3,
+      "narrative": "stable",
+      "short_pressure_weight": 0.0,
+      "avatar_color": "#3F6B78",
+      "noise_sigma": 0.0015,
+      "drift_segments": [
+        {
+          "from": 0,
+          "to": 90,
+          "drift": 0.00025
+        },
+        {
+          "from": 90,
+          "to": 150,
+          "drift": 0.00022
+        },
+        {
+          "from": 150,
+          "to": 210,
+          "drift": 0.0003
+        },
+        {
+          "from": 210,
+          "to": 240,
+          "drift": 0.00028
+        },
+        {
+          "from": 240,
+          "to": 260,
+          "drift": 0.00025
+        },
+        {
+          "from": 260,
+          "to": 280,
+          "drift": 0.0003
+        },
+        {
+          "from": 280,
+          "to": 295,
+          "drift": 0.00028
+        },
+        {
+          "from": 295,
+          "to": 315,
+          "drift": 0.0003
+        },
+        {
+          "from": 315,
+          "to": 335,
+          "drift": 0.00025
+        },
+        {
+          "from": 335,
+          "to": 355,
+          "drift": 0.0003
+        },
+        {
+          "from": 355,
+          "to": 375,
+          "drift": 0.00022
+        }
+      ]
+    },
+    {
+      "symbol": "A006",
+      "name": "씨드게임즈",
+      "sector": "게임·엔터",
+      "initial_price": 8200,
+      "liquidity": 980,
+      "beta": 1.6,
+      "fx_exposure": 0.0,
+      "narrative": "meme",
+      "short_pressure_weight": 3.0,
+      "avatar_color": "#B24C7A",
+      "noise_sigma": 0.008,
+      "drift_segments": [
+        {
+          "from": 0,
+          "to": 90,
+          "drift": 0.0001
+        },
+        {
+          "from": 90,
+          "to": 150,
+          "drift": 0.00015
+        },
+        {
+          "from": 150,
+          "to": 210,
+          "drift": 0.0002
+        },
+        {
+          "from": 210,
+          "to": 240,
+          "drift": 0.0012
+        },
+        {
+          "from": 240,
+          "to": 260,
+          "drift": 0.0035
+        },
+        {
+          "from": 260,
+          "to": 280,
+          "drift": 0.003
+        },
+        {
+          "from": 280,
+          "to": 295,
+          "drift": 0.001
+        },
+        {
+          "from": 295,
+          "to": 315,
+          "drift": -0.0005
+        },
+        {
+          "from": 315,
+          "to": 335,
+          "drift": -0.001
+        },
+        {
+          "from": 335,
+          "to": 355,
+          "drift": 0.0005
+        },
+        {
+          "from": 355,
+          "to": 375,
+          "drift": 0.00025
+        }
+      ]
+    },
+    {
+      "symbol": "A007",
+      "name": "미르소재",
+      "sector": "2차전지소재",
+      "initial_price": 6400,
+      "liquidity": 1250,
+      "beta": 1.8,
+      "fx_exposure": 0.5,
+      "narrative": "vision",
+      "short_pressure_weight": 1.0,
+      "avatar_color": "#6B4E8C",
+      "noise_sigma": 0.007,
+      "drift_segments": [
+        {
+          "from": 0,
+          "to": 90,
+          "drift": 0.0003
+        },
+        {
+          "from": 90,
+          "to": 150,
+          "drift": 0.0012
+        },
+        {
+          "from": 150,
+          "to": 210,
+          "drift": 0.0016
+        },
+        {
+          "from": 210,
+          "to": 240,
+          "drift": 0.002
+        },
+        {
+          "from": 240,
+          "to": 260,
+          "drift": 0.0024
+        },
+        {
+          "from": 260,
+          "to": 280,
+          "drift": 0.0028
+        },
+        {
+          "from": 280,
+          "to": 295,
+          "drift": 0.003
+        },
+        {
+          "from": 295,
+          "to": 315,
+          "drift": -0.0045
+        },
+        {
+          "from": 315,
+          "to": 335,
+          "drift": -0.006
+        },
+        {
+          "from": 335,
+          "to": 355,
+          "drift": -0.0035
+        },
+        {
+          "from": 355,
+          "to": 375,
+          "drift": -0.00575
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "key": "EV01",
+      "tick": 96,
+      "type": "normal",
+      "sector": "반도체",
+      "delta": -0.1,
+      "impact_delay_ticks": 8,
+      "spread_ticks": 8,
+      "difficulty": "direct",
+      "headline": "가온반도체 해외 공장 정전으로 생산라인 일부 중단",
+      "body": "복구 일정은 아직 공지되지 않았습니다"
+    },
+    {
+      "key": "EV02",
+      "tick": 138,
+      "type": "normal",
+      "sector": "2차전지소재",
+      "delta": 0.08,
+      "impact_delay_ticks": 6,
+      "spread_ticks": 6,
+      "difficulty": "direct",
+      "headline": "차세대 배터리 소재 시험 양산 성공 발표",
+      "body": "양산 물량과 납품 시점은 공개되지 않았습니다"
+    },
+    {
+      "key": "EV03",
+      "tick": 176,
+      "type": "normal",
+      "sector": "물류",
+      "delta": -0.07,
+      "impact_delay_ticks": 10,
+      "spread_ticks": 8,
+      "difficulty": "indirect",
+      "headline": "국제 유가 배럴당 12% 급등",
+      "body": "운송 원가 상승 압력이 커지고 있습니다"
+    },
+    {
+      "key": "EV03B",
+      "tick": 176,
+      "type": "normal",
+      "sector": "유통",
+      "delta": -0.035,
+      "impact_delay_ticks": 12,
+      "spread_ticks": 8,
+      "difficulty": "indirect",
+      "headline": "",
+      "body": "EV03 의 연쇄 효과. 물류비 상승이 유통 마진을 누른다"
+    },
+    {
+      "key": "EV04",
+      "tick": 215,
+      "type": "normal",
+      "symbol": "A003",
+      "delta": 0.22,
+      "impact_delay_ticks": 12,
+      "spread_ticks": 10,
+      "difficulty": "direct",
+      "headline": "청솔바이오 임상 2상 중간 결과 공개",
+      "body": "결과 해석을 두고 시장 의견이 갈리고 있습니다"
+    },
+    {
+      "key": "EV05",
+      "tick": 245,
+      "type": "short_pressure",
+      "symbol": "A006",
+      "impact_delay_ticks": 4,
+      "pump": {
+        "ticks": 8,
+        "min": 0.08,
+        "max": 0.15
+      },
+      "dump": {
+        "ticks": 12,
+        "min": 0.15,
+        "max": 0.25
+      },
+      "headline": "씨드게임즈 공매도 잔고 급증"
+    },
+    {
+      "key": "EV06",
+      "tick": 268,
+      "type": "normal",
+      "sector": "유통",
+      "delta": 0.06,
+      "impact_delay_ticks": 8,
+      "spread_ticks": 6,
+      "difficulty": "indirect",
+      "headline": "원화 강세 지속에 수입 물가 하락",
+      "body": "수입 비중이 큰 업종의 원가 부담이 줄어듭니다"
+    },
+    {
+      "key": "EV06B",
+      "tick": 268,
+      "type": "normal",
+      "sector": "반도체",
+      "delta": -0.04,
+      "impact_delay_ticks": 10,
+      "spread_ticks": 6,
+      "difficulty": "indirect",
+      "headline": "",
+      "body": "EV06 의 연쇄 효과. 같은 원화 강세가 수출주에는 채산성 악화로 작용한다"
+    },
+    {
+      "key": "EV07",
+      "tick": 292,
+      "type": "normal",
+      "sector": "2차전지소재",
+      "delta": 0.04,
+      "impact_delay_ticks": 8,
+      "spread_ticks": 6,
+      "difficulty": "counterexample",
+      "headline": "미르소재 신규 공급 계약 체결",
+      "body": "계약 규모는 공개되지 않았습니다"
+    },
+    {
+      "key": "EV08",
+      "tick": 318,
+      "type": "normal",
+      "sector": "게임·엔터",
+      "delta": -0.05,
+      "impact_delay_ticks": 4,
+      "spread_ticks": 6,
+      "difficulty": "indirect",
+      "headline": "기준금리 추가 인상 시사에 성장주 투자심리 위축",
+      "body": "이익이 먼 미래에 몰린 종목일수록 타격이 큽니다"
+    },
+    {
+      "key": "EV08B",
+      "tick": 318,
+      "type": "normal",
+      "sector": "2차전지소재",
+      "delta": -0.04,
+      "impact_delay_ticks": 6,
+      "spread_ticks": 6,
+      "difficulty": "indirect",
+      "headline": "",
+      "body": "EV08 의 연쇄 효과"
+    },
+    {
+      "key": "EV08C",
+      "tick": 318,
+      "type": "normal",
+      "sector": "바이오",
+      "delta": -0.03,
+      "impact_delay_ticks": 6,
+      "spread_ticks": 6,
+      "difficulty": "indirect",
+      "headline": "",
+      "body": "EV08 의 연쇄 효과"
+    },
+    {
+      "key": "EV09",
+      "tick": 340,
+      "type": "short_pressure",
+      "symbol": "A006",
+      "impact_delay_ticks": 4,
+      "pump": {
+        "ticks": 6,
+        "min": 0.06,
+        "max": 0.1
+      },
+      "dump": {
+        "ticks": 10,
+        "min": 0.12,
+        "max": 0.2
+      },
+      "headline": "씨드게임즈 공매도 잔고 재차 급증"
+    }
+  ]
+}

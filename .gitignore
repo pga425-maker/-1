@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+node_modules/
+frontend/dist/
+*.db
+*.sqlite3
+.env
+*.db-wal
+*.db-shm
+export_*.csv
+e2e_smoke.db
+load_test.db
+*.json.bak
