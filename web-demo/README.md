@@ -57,3 +57,16 @@
 
 파일을 브라우저로 바로 열면 된다. 폰트만 Google Fonts 에서 받으므로, 완전히 오프라인이면
 글꼴이 기본 글꼴로 떨어진다. 행사용 서버 버전은 폰트를 로컬에 번들링해서 이 문제가 없다.
+
+
+## 누구나 열 수 있는 공개 주소로 만들기
+
+이 저장소는 공개라서 GitHub Pages 를 켜면 로그인도 계정도 없이 열리는 주소가 나온다.
+빌드할 때 `docs/index.html` 에 사본이 같이 만들어진다.
+
+1. 저장소 → Settings → Pages
+2. Source 를 `Deploy from a branch` 로
+3. Branch 를 이 브랜치(또는 main)로, 폴더를 `/docs` 로 고르고 Save
+4. 1~2분 뒤 `https://pga425-maker.github.io/-1/` 로 열린다
+
+시나리오나 화면을 고쳤으면 `./web-demo/build.sh` 를 다시 돌리고 커밋해야 공개 주소도 바뀐다.

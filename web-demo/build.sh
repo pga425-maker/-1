@@ -10,6 +10,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 OUT=web-demo/index.html
+PAGES=docs/index.html
 SRC=web-demo/src
 
 python3 - <<'PY'
@@ -27,4 +28,11 @@ PY
   printf '</script>\n'
 } > "$OUT"
 
+# GitHub Pages 가 서빙하는 자리에도 같은 파일을 둔다.
+# 저장소 설정에서 Pages 소스를 /docs 로 잡으면 이 파일이 공개 주소가 된다.
+mkdir -p docs
+cp "$OUT" "$PAGES"
+touch docs/.nojekyll
+
 echo "만들었다: $OUT ($(wc -c < "$OUT") bytes)"
+echo "        : $PAGES (GitHub Pages 용 사본)"

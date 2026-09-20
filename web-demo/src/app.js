@@ -39,7 +39,14 @@ app.addEventListener('click', (ev) => {
   if (t.id === 'again'){ clearInterval(timer); paused = false; screen = 'start'; return render(); }
 
   if (t.dataset.side){ side = t.dataset.side; qty = 1; reason = null; return render(); }
-  if (t.dataset.q){ qty = Math.max(1, qty + Number(t.dataset.q)); return render(); }
+  if (t.dataset.q){
+    const step = Number(t.dataset.q);
+    const cap = side === 'buy'
+      ? maxBuyable(G, G.player, detailSymbol)
+      : (G.player.holdings[detailSymbol] || 0) - (G.player.reservedQty[detailSymbol] || 0);
+    qty = Math.max(1, Math.min(qty + step, Math.max(1, cap)));
+    return render();
+  }
   if (t.dataset.reason){ reason = t.dataset.reason; return render(); }
 
   if (t.id === 'maxBtn'){

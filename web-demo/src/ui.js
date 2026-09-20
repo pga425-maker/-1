@@ -369,6 +369,8 @@ function renderDetail(){
   if (side === 'buy' && maxBuy > 0 && qty > maxBuy) qty = maxBuy;
   if (side === 'sell' && free > 0 && qty > free) qty = free;
   const amount = qty * price, fee = Math.round(amount * G.P.fee_rate);
+  const byCash = Math.floor(p.cash / (price * (1 + G.P.fee_rate)));
+  const limitedBy = maxBuy < byCash ? '비중 상한' : '현금';
   const over = side === 'buy' && maxBuy <= 0;
   const needReason = side === 'buy' && !reason;
   const related = G.news.filter(e => e.symbol === s || e.sector === st.sector).slice(0,2);
@@ -414,10 +416,18 @@ function renderDetail(){
         <button class="step" data-q="1" aria-label="수량 1 늘리기">${SVG.plus}</button>
       </span>
     </div>
-    <button class="muted" id="maxBtn" style="font-size:11px;margin-top:4px">${
+    <div class="qrow">
+      <button class="qbtn" data-q="-100">-100</button>
+      <button class="qbtn" data-q="-10">-10</button>
+      <button class="qbtn" data-q="10">+10</button>
+      <button class="qbtn" data-q="100">+100</button>
+      <button class="qbtn strong" id="maxBtn">${side === 'buy' ? '최대' : '전량'}</button>
+    </div>
+    <div class="muted" style="font-size:11px;margin-top:6px">${
       side === 'buy'
-        ? (maxBuy > 0 ? `최대 ${maxBuy}주까지 담을 수 있습니다` : '현금이나 비중 상한 때문에 더 담을 수 없습니다')
-        : (free > 0 ? `보유 ${free}주 전량` : '팔 수 있는 수량이 없습니다')}</button>
+        ? (maxBuy > 0 ? `최대 ${maxBuy.toLocaleString('ko-KR')}주까지 담을 수 있습니다 (${limitedBy} 기준)`
+                      : '현금이나 비중 상한 때문에 더 담을 수 없습니다')
+        : (free > 0 ? `보유 ${free.toLocaleString('ko-KR')}주` : '팔 수 있는 수량이 없습니다')}</div>
     <div class="row between" style="margin-top:8px;font-size:12px">
       <span class="muted">예상 금액</span>
       <span class="num" style="font-weight:700">${won(amount)}원

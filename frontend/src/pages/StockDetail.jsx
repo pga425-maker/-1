@@ -292,6 +292,9 @@ function OrderPanel({
   needReason, asking,
 }) {
   const buying = side === 'buy'
+  // 1주씩 누르게 두면 100주를 담는 데 백 번을 눌러야 한다.
+  const cap = Math.max(1, buying ? maxBuy : maxSell)
+  const bump = (step) => setQty((q) => Math.max(1, Math.min(q + step, cap)))
   return (
     <div
       className="fixed bottom-0 left-0 right-0"
@@ -374,25 +377,41 @@ function OrderPanel({
             </button>
           </div>
         </div>
-        {!buying && maxSell > 0 && (
+        <div className="flex" style={{ gap: 6, marginTop: 8 }}>
+          {[-100, -10, 10, 100].map((step) => (
+            <button
+              key={step}
+              onClick={() => bump(step)}
+              style={{
+                flex: 1, minHeight: 38, borderRadius: 10,
+                border: `1px solid ${COLOR.line}`, background: COLOR.bg,
+                color: COLOR.muted, fontSize: 12, fontWeight: 700,
+              }}
+            >
+              {step > 0 ? `+${step}` : step}
+            </button>
+          ))}
           <button
-            onClick={() => setQty(maxSell)}
-            style={{ fontSize: 11, color: COLOR.muted, marginTop: 4 }}
+            onClick={() => setQty(cap)}
+            disabled={cap <= 1 && (buying ? maxBuy : maxSell) <= 0}
+            style={{
+              flex: 1, minHeight: 38, borderRadius: 10, border: `1px solid ${COLOR.ink}`,
+              background: COLOR.ink, color: COLOR.bg, fontSize: 12, fontWeight: 700,
+              opacity: (buying ? maxBuy : maxSell) > 0 ? 1 : 0.35,
+            }}
           >
-            보유 {maxSell}주 전량
+            {buying ? '최대' : '전량'}
           </button>
-        )}
-        {buying && (
-          <button
-            onClick={() => setQty(Math.max(1, maxBuy))}
-            disabled={maxBuy <= 0}
-            style={{ fontSize: 11, color: COLOR.muted, marginTop: 4 }}
-          >
-            {maxBuy > 0
-              ? `최대 ${maxBuy}주 (${limitedBy} 기준)`
-              : `${limitedBy} 때문에 더 담을 수 없습니다`}
-          </button>
-        )}
+        </div>
+        <div style={{ fontSize: 11, color: COLOR.muted, marginTop: 6 }}>
+          {buying
+            ? maxBuy > 0
+              ? `최대 ${maxBuy.toLocaleString('ko-KR')}주까지 담을 수 있습니다 (${limitedBy} 기준)`
+              : '현금이나 비중 상한 때문에 더 담을 수 없습니다'
+            : maxSell > 0
+              ? `보유 ${maxSell.toLocaleString('ko-KR')}주`
+              : '팔 수 있는 수량이 없습니다'}
+        </div>
 
         <div
           className="flex items-center justify-between"
