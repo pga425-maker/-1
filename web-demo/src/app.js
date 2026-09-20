@@ -50,6 +50,14 @@ app.addEventListener('click', (ev) => {
     return;
   }
   if (t.id === 'order'){
+    // 근거를 안 고른 채로 눌렀을 때 조용히 아무 일도 없으면 고장으로 보인다.
+    // 무엇이 빠졌는지 말해 주고 근거 줄을 잠깐 강조한다.
+    if (side === 'buy' && !reason){
+      toast('매수 근거를 하나 골라야 주문할 수 있습니다');
+      askUntil = Date.now() + 900;
+      setTimeout(() => { if (screen === 'detail') render(); }, 950);
+      return render();
+    }
     const res = submit(G, G.player, detailSymbol, side, qty, side === 'buy' ? reason : null);
     toast(res.msg);
     if (res.ok){ qty = 1; reason = null; }

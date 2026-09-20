@@ -5,6 +5,8 @@ const toastEl = document.getElementById('toast');
 let G = null, timer = null, screen = 'start', detailSymbol = null;
 let side = 'buy', qty = 1, reason = null, rankTab = 'return', sortBy = 'default';
 let speed = 1.2, nickname = '', paused = false;
+// 근거 줄 강조가 살아 있어야 하는 시각. 틱마다 다시 그려도 지워지지 않게 상태로 둔다.
+let askUntil = 0;
 let toastTimer = null;
 
 const SPEEDS = [
@@ -368,6 +370,7 @@ function renderDetail(){
   if (side === 'sell' && free > 0 && qty > free) qty = free;
   const amount = qty * price, fee = Math.round(amount * G.P.fee_rate);
   const over = side === 'buy' && maxBuy <= 0;
+  const needReason = side === 'buy' && !reason;
   const related = G.news.filter(e => e.symbol === s || e.sector === st.sector).slice(0,2);
 
   app.innerHTML = `<div class="wrap detail">
@@ -421,15 +424,18 @@ function renderDetail(){
         <span class="muted" style="font-weight:400">(수수료 ${won(fee)}원)</span></span>
     </div>
     ${side==='buy' ? `<div style="margin-top:10px">
-      <div class="muted" style="font-size:11px;margin-bottom:6px">매수 근거를 하나 고르세요</div>
-      <div class="chips">${REASONS.map(r =>
+      <div style="font-size:11px;margin-bottom:6px;${needReason
+        ? 'color:var(--ink);font-weight:700' : 'color:var(--muted)'}">
+        매수 근거를 하나 고르세요${needReason ? '' : ' (선택함)'}</div>
+      <div class="chips${needReason ? ' ask' : ''}${Date.now() < askUntil ? ' flash' : ''}">${REASONS.map(r =>
         `<button class="chip ${reason===r?'on':''}" data-reason="${r}">${reason===r?SVG.check:''}${r}</button>`).join('')}</div>
     </div>` : ''}
     ${over ? `<div class="up" style="font-size:12px;font-weight:700;margin-top:10px">
       현금이나 비중 상한 때문에 지금은 더 담을 수 없습니다</div>` : ''}
-    <button id="order" class="cta ${side==='sell'?'sell':''}"
-      ${(over || qty<1 || (side==='buy'&&!reason) || G.ended) ? 'disabled' : ''}>
-      ${qty}주 ${side==='buy'?'매수':'매도'} 주문하기</button>
+    <button id="order" class="cta ${side==='sell'?'sell':''} ${needReason?'ghost':''}"
+      ${(over || qty<1 || G.ended) ? 'disabled' : ''}>
+      ${needReason ? '매수 근거를 고르세요'
+                   : `${qty}주 ${side==='buy'?'매수':'매도'} 주문하기`}</button>
   </div></div>`;
   drawChart(G.history[s], chg >= 0);
 }

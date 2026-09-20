@@ -22,6 +22,7 @@ export default function StockDetail() {
   const [reason, setReason] = useState(null)
   const [message, setMessage] = useState(null)
   const [busy, setBusy] = useState(false)
+  const [asking, setAsking] = useState(false)
 
   const stock = snapshot?.stocks.find((s) => s.symbol === symbol)
   const holding = snapshot?.me?.holdings.find((h) => h.symbol === symbol)
@@ -51,12 +52,19 @@ export default function StockDetail() {
   const maxBuy = Math.max(0, Math.min(byCash, byRoom))
   const limitedBy = byRoom < byCash ? '비중 상한' : '현금'
   const overLimit = side === 'buy' && qty > maxBuy
+  // 근거를 안 고른 상태에서 버튼을 죽여 두면, 눌러도 아무 일이 없어서 고장으로 보인다.
+  // 버튼은 살려 두고 무엇이 빠졌는지 버튼 글자로 알린다.
+  const needReason = side === 'buy' && !reason
   const canSubmit =
-    qty > 0 &&
-    (side === 'sell' || (reason && !overLimit)) &&
-    snapshot.session.status === 'running'
+    qty > 0 && !overLimit && snapshot.session.status === 'running'
 
   async function submit() {
+    if (needReason) {
+      setMessage({ tone: 'error', text: '매수 근거를 하나 골라야 주문할 수 있습니다' })
+      setAsking(true)
+      setTimeout(() => setAsking(false), 900)
+      return
+    }
     setBusy(true)
     setMessage(null)
     try {
@@ -177,6 +185,8 @@ export default function StockDetail() {
         maxBuy={maxBuy}
         limitedBy={limitedBy}
         overLimit={overLimit}
+        needReason={needReason}
+        asking={asking}
       />
     </div>
   )
@@ -279,6 +289,7 @@ function PriceChart({ data, rising }) {
 function OrderPanel({
   side, setSide, qty, setQty, reason, setReason, amount, fee,
   canSubmit, busy, onSubmit, message, maxSell, maxBuy, limitedBy, overLimit,
+  needReason, asking,
 }) {
   const buying = side === 'buy'
   return (
@@ -398,7 +409,13 @@ function OrderPanel({
 
         {buying && (
           <div style={{ marginTop: 10 }}>
-            <div style={{ fontSize: 11, color: COLOR.muted, marginBottom: 6 }}>
+            <div
+              style={{
+                fontSize: 11, marginBottom: 6,
+                color: needReason ? COLOR.ink : COLOR.muted,
+                fontWeight: needReason ? 700 : 400,
+              }}
+            >
               매수 근거를 하나 고르세요
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -409,11 +426,15 @@ function OrderPanel({
                     key={r}
                     onClick={() => setReason(r)}
                     style={{
-                      background: active ? COLOR.ink : COLOR.bg,
+                      background: asking ? '#FDF3E2' : active ? COLOR.ink : COLOR.bg,
                       color: active ? COLOR.bg : COLOR.muted,
                       borderRadius: 20, padding: '7px 12px', fontSize: 12,
                       fontWeight: active ? 700 : 400,
                       display: 'flex', alignItems: 'center', gap: 4,
+                      boxShadow: needReason
+                        ? `inset 0 0 0 ${asking ? 2 : 1}px rgba(242,169,59,${asking ? 1 : 0.7})`
+                        : 'none',
+                      transition: 'box-shadow .15s, background .15s',
                     }}
                   >
                     {active && <IconCheck color={COLOR.bg} />}
@@ -449,12 +470,14 @@ function OrderPanel({
           style={{
             width: '100%', marginTop: 12, borderRadius: 14, padding: '15px 0',
             fontSize: 15, fontWeight: 700,
-            background: buying ? COLOR.ink : COLOR.up,
-            color: COLOR.bg,
+            background: needReason ? COLOR.tag : buying ? COLOR.ink : COLOR.up,
+            color: needReason ? COLOR.muted : COLOR.bg,
             opacity: !canSubmit || busy ? 0.45 : 1,
           }}
         >
-          {qty}주 {buying ? '매수' : '매도'} 주문하기
+          {needReason
+            ? '매수 근거를 고르세요'
+            : `${qty}주 ${buying ? '매수' : '매도'} 주문하기`}
         </button>
       </div>
     </div>
