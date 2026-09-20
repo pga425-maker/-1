@@ -144,7 +144,8 @@ const BEHAVIOR_LABEL = {momentum:'모멘텀추종',contrarian:'역추세',news:'
                         hold:'매수후보유',mixed:'혼합'};
 
 function makeAccount(cash){
-  return { cash, reserved: 0, holdings: {}, avgCost: {}, reservedQty: {} };
+  return { cash, reserved: 0, holdings: {}, avgCost: {}, reservedQty: {},
+           buys: [], trades: [] };
 }
 function assetOf(acc, prices){
   let v = acc.cash + acc.reserved;
@@ -191,6 +192,7 @@ function createGame(sc, seed, nickname){
     stats: { prev: sc.starting_cash, peak: sc.starting_cash, n: 0, mean: 0, m2: 0, mdd: 0 },
     contrib: { base: 0, event: 0, fear: 0, fx: 0 },
     lots: {}, buys: [], sells: [], orderLog: [],
+    windowBuys: [], crowd: [],
     ended: false,
   };
 }
@@ -261,11 +263,14 @@ function fill(G, o){
     const prevC = (acc.avgCost[o.symbol] || 0) * prevQ;
     acc.holdings[o.symbol] = prevQ + qty;
     acc.avgCost[o.symbol] = (prevC + gross + f) / (prevQ + qty);
+    acc.buys.push({ symbol: o.symbol, tick: o.tick, reason: o.reason, qty, price: p });
+    acc.trades.push({ side: 'buy', symbol: o.symbol, qty, price: p, tick: G.tick, reason: o.reason });
     if (acc === G.player){
       (G.lots[o.symbol] = G.lots[o.symbol] || []).push({ qty, price: p, reason: o.reason });
-      G.buys.push({ symbol: o.symbol, tick: o.tick, reason: o.reason, qty, price: p });
-      G.orderLog.push({ side: 'buy', symbol: o.symbol, qty, price: p, tick: G.tick, reason: o.reason });
+      G.buys = acc.buys; G.orderLog = acc.trades;
     }
+    // 군중이 무엇을 사고 있는지 집계한다
+    G.windowBuys.push({ acc, symbol: o.symbol, value: qty * p });
     return qty;
   }
   acc.reservedQty[o.symbol] = Math.max(0, (acc.reservedQty[o.symbol] || 0) - o.qty);
@@ -275,6 +280,7 @@ function fill(G, o){
   acc.cash += gross - f;
   acc.holdings[o.symbol] -= qty;
   if (acc.holdings[o.symbol] === 0){ delete acc.holdings[o.symbol]; delete acc.avgCost[o.symbol]; }
+  acc.trades.push({ side: 'sell', symbol: o.symbol, qty, price: p, tick: G.tick });
   if (acc === G.player){
     let rest = qty;
     const q = G.lots[o.symbol] || [];
@@ -285,7 +291,7 @@ function fill(G, o){
       lot.qty -= take; rest -= take;
       if (lot.qty === 0) q.shift();
     }
-    G.orderLog.push({ side: 'sell', symbol: o.symbol, qty, price: p, tick: G.tick });
+    G.orderLog = acc.trades;
   }
   return qty;
 }
@@ -437,6 +443,7 @@ function step(G){
     G.disp = { fear: fearNext - G.fear[anchor], fx: fxNext - G.fx[anchor] };
     refreshRank(G);
     refreshFlow(G, buyQ, sellQ);
+    detectCrowd(G, anchor, t);
   }
   if (t >= G.total){ G.ended = true; refreshRank(G); }
 }
@@ -458,6 +465,24 @@ function refreshRank(G){
     (a, b) => (a.rankReturn + a.rankRisk) / 2 - (b.rankReturn + b.rankRisk) / 2 || a.mdd - b.mdd);
   byTotal.forEach((r, i) => r.rankTotal = i + 1);
   G.rank = rows;
+}
+
+/* 한 종목에 매수가 몰린 구간을 찾는다. 결과 화면의 군중심리 비교에 쓴다. */
+function detectCrowd(G, from, to){
+  const rows = G.windowBuys;
+  G.windowBuys = [];
+  if (!rows.length) return;
+  const byS = {}, who = {};
+  let grand = 0;
+  for (const r of rows){
+    byS[r.symbol] = (byS[r.symbol] || 0) + r.value;
+    (who[r.symbol] = who[r.symbol] || new Set()).add(r.acc);
+    grand += r.value;
+  }
+  const top = Object.keys(byS).reduce((a, c) => byS[c] > byS[a] ? c : a, Object.keys(byS)[0]);
+  if (!grand || byS[top] / grand < 0.6) return;
+  if (who[top].size < 3) return;
+  G.crowd.push({ from, to, symbol: top, share: byS[top] / grand, followers: who[top] });
 }
 
 function refreshFlow(G, buyQ, sellQ){

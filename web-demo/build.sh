@@ -23,7 +23,7 @@ PY
 {
   cat "$SRC/shell.html"
   printf '<script>\n'
-  cat "$SRC/scenario.js" "$SRC/engine.js" "$SRC/ui.js" "$SRC/result.js"
+  cat "$SRC/scenario.js" "$SRC/engine.js" "$SRC/ui.js" "$SRC/result.js" "$SRC/app.js"
   printf '</script>\n'
 } > "$OUT"
 

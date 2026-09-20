@@ -4,7 +4,7 @@ const app = document.getElementById('app');
 const toastEl = document.getElementById('toast');
 let G = null, timer = null, screen = 'start', detailSymbol = null;
 let side = 'buy', qty = 1, reason = null, rankTab = 'return', sortBy = 'default';
-let speed = 1.2, nickname = '';
+let speed = 1.2, nickname = '', paused = false;
 let toastTimer = null;
 
 const SPEEDS = [
@@ -93,7 +93,11 @@ function bannerHTML(){
 function topbarHTML(title){
   const left = G.total - G.tick;
   return `<div class="topbar"><span class="title">${esc(title)}</span>
-    <span class="pill num">${SVG.clock}${clock(left * G.sc.tick_seconds)}</span></div>`;
+    <span class="row" style="gap:8px">
+      <button id="pause" class="tag" style="padding:6px 11px;min-height:32px">
+        ${paused ? '재개' : '일시정지'}</button>
+      <span class="pill num">${SVG.clock}${clock(left * G.sc.tick_seconds)}</span>
+    </span></div>`;
 }
 function tabbarHTML(active){
   const tabs = [['home','홈'],['market','시세'],['news','뉴스'],['rank','랭킹']];
@@ -122,9 +126,9 @@ function renderStart(){
     <p class="muted" style="font-size:13px;margin:8px 0 0">
       시작 자금 1,000만 원으로 가상 종목 7개에 투자합니다</p>
     <div class="note" style="margin-top:14px">
-      축제 부스용으로 만든 웹앱의 체험판입니다. 실제 행사에서는 참가자 50명이
-      각자 휴대폰으로 접속해 같은 시장에서 겨루고, 여기서는 봇 15명과 겨룹니다.
-      종목과 뉴스는 전부 가상이며 실제 주가 데이터를 쓰지 않습니다.
+      가상 종목 7개와 뉴스 이벤트가 있는 30분짜리 시장에서 다른 참가자 15명과 겨룹니다.
+      끝나면 수익률뿐 아니라 위험조정 점수, 매수 근거별 성적, 투자 성향까지 짚어 줍니다.
+      실존 기업과 실제 주가 데이터는 쓰지 않습니다.
     </div>
     <label for="nick" class="muted" style="display:block;font-size:12px;margin-top:22px">닉네임</label>
     <input id="nick" maxlength="12" placeholder="12자 이내" autocomplete="off"
@@ -155,6 +159,7 @@ function start(){
   if (!name){ toast('닉네임을 입력해 주세요'); document.getElementById('nick').focus(); return; }
   nickname = name;
   G = createGame(SCENARIO, (Date.now() % 100000) + 1, name);
+  paused = false;
   refreshRank(G);
   screen = 'home';
   render();
