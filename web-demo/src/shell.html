@@ -19,7 +19,7 @@
   button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer;padding:0}
   input{font-family:inherit}
   .wrap{max-width:480px;margin:0 auto;padding:0 20px 96px;min-height:100%}
-  .wrap.detail{padding-bottom:340px}
+  .wrap.detail{padding-bottom:calc(330px + env(safe-area-inset-bottom,0px))}
   .wrap.plain{padding-bottom:40px}
   .display{font-family:var(--display);font-weight:400;letter-spacing:-0.01em}
   .muted{color:var(--muted)}

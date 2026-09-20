@@ -10,11 +10,30 @@ function render(){
   if (screen === 'result') return renderResult();
 }
 
-function goDetail(sym){
-  detailSymbol = sym; screen = 'detail';
-  side = 'buy'; qty = 1; reason = null;
+/* 화면을 옮길 때 브라우저 기록을 쌓는다.
+   이게 없으면 휴대폰 뒤로가기가 앱을 통째로 닫아 버린다. */
+function navigate(next, sym){
+  if (sym) detailSymbol = sym;
+  screen = next;
+  try {
+    history.pushState({ screen: next, detailSymbol }, '');
+  } catch (e) { /* 기록을 못 쌓아도 화면 이동은 되어야 한다 */ }
   render();
 }
+
+function goDetail(sym){
+  side = 'buy'; qty = 1; reason = null;
+  navigate('detail', sym);
+}
+
+window.addEventListener('popstate', (ev) => {
+  const st = ev.state;
+  if (!st || !st.screen) return;
+  screen = st.screen;
+  if (st.detailSymbol) detailSymbol = st.detailSymbol;
+  if (screen === 'detail'){ side = 'buy'; qty = 1; reason = null; }
+  render();
+});
 
 function togglePause(){
   if (G.ended) return;
@@ -29,14 +48,14 @@ app.addEventListener('click', (ev) => {
     '[data-reason],#back,#order,#again,#maxBtn,#pause');
   if (!t) return;
 
-  if (t.dataset.tab){ screen = t.dataset.tab; return render(); }
+  if (t.dataset.tab) return navigate(t.dataset.tab);
   if (t.dataset.go) return goDetail(t.dataset.go);
   if (t.dataset.stock) return goDetail(t.dataset.stock);
   if (t.dataset.rank){ rankTab = t.dataset.rank; return render(); }
   if (t.dataset.sort){ sortBy = t.dataset.sort; return render(); }
-  if (t.id === 'back'){ screen = 'home'; return render(); }
+  if (t.id === 'back'){ history.back(); return; }
   if (t.id === 'pause') return togglePause();
-  if (t.id === 'again'){ clearInterval(timer); paused = false; screen = 'start'; return render(); }
+  if (t.id === 'again'){ clearInterval(timer); paused = false; return navigate('start'); }
 
   if (t.dataset.side){ side = t.dataset.side; qty = 1; reason = null; return render(); }
   if (t.dataset.q){
@@ -86,4 +105,5 @@ window.addEventListener('resize', () => {
   }
 });
 
+try { history.replaceState({ screen: 'start' }, ''); } catch (e) { /* 무시 */ }
 render();

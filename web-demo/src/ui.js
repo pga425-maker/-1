@@ -164,6 +164,7 @@ function start(){
   paused = false;
   refreshRank(G);
   screen = 'home';
+  try { history.pushState({ screen: 'home' }, ''); } catch (e) { /* 무시 */ }
   render();
   startTimer();
 }
@@ -374,6 +375,7 @@ function renderDetail(){
   const over = side === 'buy' && maxBuy <= 0;
   const needReason = side === 'buy' && !reason;
   const related = G.news.filter(e => e.symbol === s || e.sector === st.sector).slice(0,2);
+  const hist = G.history[s];
 
   app.innerHTML = `<div class="wrap detail">
     <div class="row" style="gap:10px;padding:18px 0 12px">
@@ -389,19 +391,30 @@ function renderDetail(){
       <span class="s">공매도 집중으로 위험하지만, 일시적으로 오를 수 있습니다</span></span></div>` : ''}
     <div class="display num" style="font-size:30px;line-height:1.2">${won(price)}</div>
     <div class="num ${cls(diff)}" style="font-size:14px;font-weight:700">${signedWon(diff)} (${pct(chg)})</div>
-    <div class="card" style="margin-top:12px;padding:8px"><canvas id="chart" height="168"></canvas></div>
+    <div class="card" style="margin-top:12px;padding:8px"><canvas id="chart"></canvas></div>
     <div class="card" style="margin-top:10px">
       <div class="kv"><span class="k">보유 수량</span><span class="v num">${q}주</span></div>
       <div class="kv"><span class="k">평균매입가</span><span class="v num">${avg ? won(avg)+'원' : '―'}</span></div>
       <div class="kv"><span class="k">평가손익</span><span class="v num ${q?cls(price-avg):''}">
         ${q ? signedWon(q*(price-avg)) + ' (' + pct(price/avg-1) + ')' : '―'}</span></div>
     </div>
-    ${related.length ? `<div class="sechead"><span class="h">관련 뉴스</span></div>
-      <div class="list">${related.map(e => `<div class="card">
+    <div class="card" style="margin-top:10px">
+      <div class="kv"><span class="k">시작가</span><span class="v num">${won(st.initial_price)}원</span></div>
+      <div class="kv"><span class="k">오늘 최고가</span>
+        <span class="v num up">${won(Math.max(...hist))}원</span></div>
+      <div class="kv"><span class="k">오늘 최저가</span>
+        <span class="v num down">${won(Math.min(...hist))}원</span></div>
+      <div class="kv"><span class="k">성격</span>
+        <span class="v">${NARRATIVE_LABEL[st.narrative] || '―'}</span></div>
+    </div>
+    <div class="sechead"><span class="h">관련 뉴스</span></div>
+    <div class="list">${related.length ? related.map(e => `<div class="card">
         <div class="row between" style="gap:8px;align-items:flex-start">
           <span style="font-size:13px;font-weight:700;line-height:1.4">${esc(e.headline)}</span>
           <span class="badge ${stateOf(e)}">${STATE_LABEL[stateOf(e)]}</span></div>
-      </div>`).join('')}</div>` : ''}
+      </div>`).join('')
+      : `<div class="card"><span class="muted" style="font-size:12px">
+         이 종목과 관련된 소식이 아직 없습니다. 첫 헤드라인은 7분쯤 뒤에 뜹니다</span></div>`}</div>
   </div>
   <div class="panel"><div class="inner">
     <div class="seg">
@@ -454,7 +467,10 @@ function drawChart(data, rising){
   const cv = document.getElementById('chart');
   if (!cv) return;
   const dpr = window.devicePixelRatio || 1;
-  const w = cv.clientWidth, h = 168;
+  // 화면이 길수록 차트를 키운다. 고정 높이로 두면 긴 폰에서 위가 텅 빈다.
+  const h = Math.round(Math.max(170, Math.min(300, window.innerHeight * 0.26)));
+  cv.style.height = h + 'px';
+  const w = cv.clientWidth;
   cv.width = w * dpr; cv.height = h * dpr;
   const ctx = cv.getContext('2d');
   ctx.scale(dpr, dpr);

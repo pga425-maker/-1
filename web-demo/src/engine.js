@@ -142,6 +142,9 @@ const BOT_NAMES = ['별하','도현','서윤','지후','하람','예린','太민
                    '시온','나윤','주안','다온','은결','해찬','린아','소율'];
 const BEHAVIOR_LABEL = {momentum:'모멘텀추종',contrarian:'역추세',news:'뉴스반응',
                         hold:'매수후보유',mixed:'혼합'};
+const NARRATIVE_LABEL = {supercycle:'대형 성장주', binary:'한 방에 갈리는 종목',
+                         stable:'변동이 작은 안정주', meme:'루머에 흔들리는 소형주',
+                         vision:'기대감으로 오르는 종목'};
 
 function makeAccount(cash){
   return { cash, reserved: 0, holdings: {}, avgCost: {}, reservedQty: {},
